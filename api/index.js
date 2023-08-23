@@ -1,7 +1,7 @@
-const apiRouter = require('express').Router();
-const jwt = require('jsonwebtoken');
+import express from 'express';
+const apiRouter = express.Router();
 const { JWT_SECRET } = process.env;
-const { getUserById } = require('../db/models/users');
+// const { getUserById } = require('../db/models/users');
 
 // this middleware checks the "Authorization" header passed to the route and gets user object if the token is verified
 apiRouter.use(async (req, res, next) => {
@@ -36,9 +36,9 @@ apiRouter.use(async (req, res, next) => {
 
 // API routers
 
-const userRouter = require('./users');
+import { userRouter} from './users.js';
 apiRouter.use('/users', userRouter);
 
 
 
-export { apiRouter} ;
+export { apiRouter };

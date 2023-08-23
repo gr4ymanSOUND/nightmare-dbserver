@@ -24,11 +24,14 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);// const path = require('path');
+const __dirname = path.dirname(__filename);
+// const path = require('path');
 server.use(express.static(path.join(__dirname, 'build')));
 
 // here's our API
 // server.use('/api', require('./api'));
+import { apiRouter } from './api/index.js';
+// server.use('/api', api)
 
 // connect to the server
 const PORT = process.env.PORT || 4000;
