@@ -24,11 +24,12 @@ async function getUser({ username, password }) {
       WHERE username = ?;
     `, [username]);
     
-    if (!user) {
-      throw new Error('issue logging in');
-    };
+    // if (!user) {
+    //   throw new Error('issue logging in');
+    // };
 
-    console.log(user);
+    console.log('user getUser for login after select statement', user);
+
     const userPassword = user.password;
     const passwordMatch = await bcrypt.compare(password, userPassword);
     if (!passwordMatch) return;
@@ -40,6 +41,8 @@ async function getUser({ username, password }) {
 }
 
 async function getUserById(id) {
+  console.log('id in userById', id );
+
   try {
     const [ user ] = await pool.query(`
       SELECT *
@@ -47,8 +50,13 @@ async function getUserById(id) {
       WHERE id = ?;
     `, [id]);
 
-    delete user.password;
-    return user;
+    // this is required because I was unable to destructure 2 layers into the nested arrays to access the actual user object like I did in the "getUser" function above
+    // this should be functionally equivalient to doing "const [[user]]" in the pool.query
+    const userDestructured = user[0];
+
+
+    delete userDestructured.password;
+    return userDestructured;
   } catch (error) {
     throw error;
   }
@@ -56,7 +64,6 @@ async function getUserById(id) {
 
 async function createUser(userInfo) {
   try {
-    console.log(userInfo);
     const hashedPassword = await bcrypt.hash(userInfo.password, SALT);
     userInfo.password = hashedPassword;
     const valueString = Object.keys(userInfo).map(
@@ -74,7 +81,7 @@ async function createUser(userInfo) {
     `, Object.values(userInfo));
 
     const newUserId = result.insertId;
-    const newUser = getUserById(newUserId);
+    const newUser = await getUserById(newUserId);
     return newUser;
   } catch (error) {
     throw error;
@@ -84,15 +91,21 @@ async function createUser(userInfo) {
 async function updateUser(userId, userInfo) {
   try {
     const valueString = Object.keys(userInfo).map(
-      (key, index) => `'${key}' = '${userInfo[key]}'`
+      (key, index) => {
+        // special case for the allow_email field - since it's boolean, we need to remove the quotes from the 2nd half of the entry
+        if (key == 'allow_email') {
+          return `${key} = ${userInfo[key]}`
+        }
+        return `${key} = '${userInfo[key]}'`
+      }
     ).join(', ');
-    const [ updatedUserId ] = await pool.query(`
+    const [ results ] = await pool.query(`
       UPDATE users
       SET ${valueString}
-      WHERE id = $1;
+      WHERE id = ?;
     `, [userId]);
 
-    const updatedUser = getUserById(updatedUserId);
+    const updatedUser = await getUserById(userId);
     return updatedUser;
   } catch (error) {
     throw error;
