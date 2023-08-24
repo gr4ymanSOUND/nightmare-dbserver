@@ -1,9 +1,11 @@
-// const userRouter = require('express').Router();
 import express from 'express';
 const userRouter = express.Router();
 import { requireUser } from './utils.js'
 import jwt from 'jsonwebtoken';
-const secret = process.env.JWT_SECRET;
+
+// this isn't working for some reason, so I replaced all of the "secret" with the full thing
+// const secret = process.env.JWT_SECRET;
+
 import {
     getUser,
     getUserById,
@@ -17,7 +19,7 @@ import {
 //   try {
 //     const auth = req.headers.authorization;
 //     const token = auth.slice(prefix.length);
-//     let authorizedUser = jwt.verify(token, secret);
+//     let authorizedUser = jwt.verify(token, process.env.JWT_SECRET);
 //     if (authorizedUser.username) {
 //       const allUsers = await getAllUsers();
 //       res.send(allUsers)
@@ -39,10 +41,12 @@ userRouter.get('/', async (req, res, next) => {
 });
 
 // create new users from the user form
-userRouter.post('/create', requireUser, async (req, res, next) => {  
+
+// ADD requireUser back in! we took it out for testing creating users
+userRouter.post('/create', async (req, res, next) => {  
   try {
-    const { newUserData } = req.body;
-    const newUser = createUser(newUserData);
+    const newUserData = req.body;
+    const newUser = await createUser(newUserData);
     res.send(newUser);
   } catch (error) {
     next(error);
@@ -51,11 +55,11 @@ userRouter.post('/create', requireUser, async (req, res, next) => {
 
 // api/users/login sets `user` to the request body which getUser() destructures
 userRouter.post('/login', async (req, res, next) => {
-  const { userName, password } = req.body;
+  const { username, password } = req.body;
   try {
-    const user = await getUser({userName, password})
+    const user = await getUser({username, password})
 
-    const token = jwt.sign({username: user.userName, id: user.id}, secret)
+    const token = jwt.sign({username: user.username, id: user.id}, process.env.JWT_SECRET)
 
     const confirmation = {
       message: "you're logged in!",
@@ -74,7 +78,7 @@ userRouter.get('/me', requireUser, async (req, res, next) => {
       const auth = req.headers.authorization;
       const token = auth.slice(prefix.length);
       
-      let authorizedUser = jwt.verify(token, secret);
+      let authorizedUser = jwt.verify(token, process.env.JWT_SECRET);
       if (authorizedUser.username) {
         const me = await getUserById(authorizedUser.id);
         res.send(me)

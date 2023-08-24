@@ -1,16 +1,12 @@
 import { pool } from '../connectionpool.js'
 
-// basic format
-// const result = await pool.query("SELECT * FROM users");
-
-
 import bcrypt from 'bcrypt';
 const SALT = 13;
 
 async function getAllUsers() {
     try {
       const [ allUsers ] = await pool.query(`
-        SELECT id, "firstName", "lastName", email, "userName", "isAdmin", status
+        SELECT id, email, username, allow_email, status
         FROM users;
       `);
       return allUsers;
@@ -19,19 +15,20 @@ async function getAllUsers() {
     }
 }
   
-async function getUser({ userName, password }) {
+async function getUser({ username, password }) {
 
   try {
-    const {rows: [user]}= await pool.query(`
+    const [ [user] ]= await pool.query(`
       SELECT *
       FROM users
-      WHERE "userName" = $1;
-    `, [userName]);
+      WHERE username = ?;
+    `, [username]);
     
     if (!user) {
       throw new Error('issue logging in');
     };
 
+    console.log(user);
     const userPassword = user.password;
     const passwordMatch = await bcrypt.compare(password, userPassword);
     if (!passwordMatch) return;
@@ -42,37 +39,12 @@ async function getUser({ userName, password }) {
   }
 }
 
-async function createUser(userInfo) {
-  try {
-    const hashedPassword = await bcrypt.hash(userInfo.password, SALT);
-    userInfo.password = hashedPassword;
-    const valueString = Object.keys(userInfo).map(
-      (key, index) => `$${ index+1 }`
-    ).join(', ');
-
-  const keyString = Object.keys(userInfo).map(
-      (key) => `"${ key }"`
-    ).join(', ');
-
-    const {rows: [newUser]} = await pool.query(`
-      INSERT INTO users (${keyString})
-      VALUES (${valueString})
-      RETURNING *;
-    `, Object.values(userInfo));
-
-    delete newUser.password;
-    return newUser;
-  } catch (error) {
-    throw error;
-  }
-}
-
 async function getUserById(id) {
   try {
-    const {rows: [user]} = await pool.query(`
+    const [ user ] = await pool.query(`
       SELECT *
       FROM users
-      WHERE id = $1;
+      WHERE id = ?;
     `, [id]);
 
     delete user.password;
@@ -82,17 +54,45 @@ async function getUserById(id) {
   }
 }
 
+async function createUser(userInfo) {
+  try {
+    console.log(userInfo);
+    const hashedPassword = await bcrypt.hash(userInfo.password, SALT);
+    userInfo.password = hashedPassword;
+    const valueString = Object.keys(userInfo).map(
+      (key, index) => `?`
+    ).join(', ');
+
+  const keyString = Object.keys(userInfo).map(
+      (key) => `${ key }`
+    ).join(', ');
+
+    // this should return the 
+    const [ result ] = await pool.query(`
+      INSERT INTO users (${keyString})
+      VALUES (${valueString});
+    `, Object.values(userInfo));
+
+    const newUserId = result.insertId;
+    const newUser = getUserById(newUserId);
+    return newUser;
+  } catch (error) {
+    throw error;
+  }
+}
+
 async function updateUser(userId, userInfo) {
   try {
     const valueString = Object.keys(userInfo).map(
-      (key, index) => `"${key}" = '${userInfo[key]}'`
+      (key, index) => `'${key}' = '${userInfo[key]}'`
     ).join(', ');
-    const { rows: [updatedUser] } = await pool.query(`
+    const [ updatedUserId ] = await pool.query(`
       UPDATE users
       SET ${valueString}
-      WHERE id = $1
-      RETURNING *;
+      WHERE id = $1;
     `, [userId]);
+
+    const updatedUser = getUserById(updatedUserId);
     return updatedUser;
   } catch (error) {
     throw error;

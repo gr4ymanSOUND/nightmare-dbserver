@@ -1,4 +1,6 @@
-import pool from './connectionpool'
+import { pool } from './connectionpool.js'
+
+import { createUser } from './models/users.js';
 
 const result = await pool.query("SELECT * FROM users");
 
@@ -21,7 +23,7 @@ async function buildTables() {
       username VARCHAR(255) UNIQUE NOT NULL, 
       password VARCHAR(255) UNIQUE NOT NULL,
       allow_email BOOLEAN DEFAULT false,
-      status VARCHAR(255) NOT NULL
+      status VARCHAR(255) NOT NULL DEFAULT 'active'
     );
     `);
 
@@ -31,16 +33,16 @@ async function buildTables() {
 }
 
 async function addInitialData () {
-  try {
-    await pool.query(`
-      INSERT INTO users (email, username, password, allow_email, status)
-      VALUES 
-      ('austin.lawrence.al@gmail.com', 'coolhatguy', 'ochoseis', true, 'active'),
-      ('testing@test.test', 'test', 'testing', false, 'inactive');
-    `);
-  } catch (error) {
-    throw(error)
-  }
+
+    const usersToCreate =   [
+      { email:'austin.lawrence.al@gmail.com', username:'coolhatguy', password:'ochocinco', allow_email: true, status: 'active' },
+      { email:'testing@test.test', username:'tester', password:'TOASTY', allow_email: false, status: 'active' }
+    ];
+
+    console.log("creating users");
+    const [users] = await Promise.all(usersToCreate.map(createUser));
+    console.log(users);
+    console.log("finished creating users!!");
 }
 
 
