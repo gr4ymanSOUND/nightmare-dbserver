@@ -31,7 +31,7 @@ server.use(express.static(path.join(__dirname, 'build')));
 // here's our API
 // server.use('/api', require('./api'));
 import { apiRouter } from './api/index.js';
-// server.use('/api', api)
+server.use('/api', apiRouter);
 
 // connect to the server
 const PORT = process.env.PORT || 4000;

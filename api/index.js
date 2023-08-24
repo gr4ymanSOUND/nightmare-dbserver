@@ -2,6 +2,7 @@ import express from 'express';
 const apiRouter = express.Router();
 const { JWT_SECRET } = process.env;
 // const { getUserById } = require('../db/models/users');
+import { getUserById } from '../db/models/users.js';
 
 // this middleware checks the "Authorization" header passed to the route and gets user object if the token is verified
 apiRouter.use(async (req, res, next) => {

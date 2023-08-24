@@ -4,26 +4,35 @@ const userRouter = express.Router();
 import { requireUser } from './utils.js'
 import jwt from 'jsonwebtoken';
 const secret = process.env.JWT_SECRET;
-// const {
-//     getUser,
-//     getUserById,
-//     getAllUsers,
-//     updateUser,
-//     createUser
-// } = require('../db/models/users');
+import {
+    getUser,
+    getUserById,
+    getAllUsers,
+    updateUser,
+    createUser
+} from '../db/models/users.js';
 
-userRouter.get('/', requireUser, async (req, res, next) => {
-  const prefix = 'Bearer ';
+// userRouter.get('/', requireUser, async (req, res, next) => {
+//   const prefix = 'Bearer ';
+//   try {
+//     const auth = req.headers.authorization;
+//     const token = auth.slice(prefix.length);
+//     let authorizedUser = jwt.verify(token, secret);
+//     if (authorizedUser.username) {
+//       const allUsers = await getAllUsers();
+//       res.send(allUsers)
+//     } else {
+//       throw new Error('error getting all user info');
+//     }
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+userRouter.get('/', async (req, res, next) => {
   try {
-    const auth = req.headers.authorization;
-    const token = auth.slice(prefix.length);
-    let authorizedUser = jwt.verify(token, secret);
-    if (authorizedUser.username) {
-      const allUsers = await getAllUsers();
-      res.send(allUsers)
-    } else {
-      throw new Error('error getting all user info');
-    }
+    const allUsers = await getAllUsers();
+    res.send(allUsers)
   } catch (error) {
     next(error);
   }
