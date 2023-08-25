@@ -16,6 +16,9 @@ async function getAllUsers() {
 }
   
 async function getUser({ username, password }) {
+  
+  console.log('username and password in getUser after register', username, password);
+
 
   try {
     const [ [user] ]= await pool.query(`
@@ -28,8 +31,6 @@ async function getUser({ username, password }) {
     //   throw new Error('issue logging in');
     // };
 
-    console.log('user getUser for login after select statement', user);
-
     const userPassword = user.password;
     const passwordMatch = await bcrypt.compare(password, userPassword);
     if (!passwordMatch) return;
@@ -41,7 +42,6 @@ async function getUser({ username, password }) {
 }
 
 async function getUserById(id) {
-  console.log('id in userById', id );
 
   try {
     const [ user ] = await pool.query(`
@@ -63,7 +63,9 @@ async function getUserById(id) {
 }
 
 async function createUser(userInfo) {
+  
   try {
+    console.log('userInfo in db models', userInfo);
     const hashedPassword = await bcrypt.hash(userInfo.password, SALT);
     userInfo.password = hashedPassword;
     const valueString = Object.keys(userInfo).map(

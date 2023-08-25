@@ -3,7 +3,7 @@ const userRouter = express.Router();
 import { requireUser } from './utils.js'
 import jwt from 'jsonwebtoken';
 
-// this isn't working for some reason, so I replaced all of the "secret" with the full thing
+// this isn't working for some reason, so I replaced all of the "secret" variables with the full thing
 // const secret = process.env.JWT_SECRET;
 
 import {
@@ -41,12 +41,11 @@ userRouter.get('/', requireUser, async (req, res, next) => {
 //   }
 // });
 
+
 // create new users from the user form
-
-
-userRouter.post('/create', requireUser, async (req, res, next) => {  
+userRouter.post('/create', async (req, res, next) => {  
   try {
-    const newUserData = req.body;
+    const { newUserData }  = req.body;
     const newUser = await createUser(newUserData);
     res.send(newUser);
   } catch (error) {
@@ -57,6 +56,8 @@ userRouter.post('/create', requireUser, async (req, res, next) => {
 // api/users/login sets `user` to the request body which getUser() destructures
 userRouter.post('/login', async (req, res, next) => {
   const { username, password } = req.body;
+
+  console.log('req body in login after register', req.body)
 
   try {
     const user = await getUser({username, password});
