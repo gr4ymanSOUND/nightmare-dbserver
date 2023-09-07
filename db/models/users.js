@@ -16,9 +16,6 @@ async function getAllUsers() {
 }
   
 async function getUser({ username, password }) {
-  
-  console.log('username and password in getUser after register', username, password);
-
 
   try {
     const [ [user] ]= await pool.query(`
@@ -26,10 +23,6 @@ async function getUser({ username, password }) {
       FROM users
       WHERE username = ?;
     `, [username]);
-    
-    // if (!user) {
-    //   throw new Error('issue logging in');
-    // };
 
     const userPassword = user.password;
     const passwordMatch = await bcrypt.compare(password, userPassword);
@@ -65,7 +58,6 @@ async function getUserById(id) {
 async function createUser(userInfo) {
   
   try {
-    console.log('userInfo in db models', userInfo);
     const hashedPassword = await bcrypt.hash(userInfo.password, SALT);
     userInfo.password = hashedPassword;
     const valueString = Object.keys(userInfo).map(
@@ -92,6 +84,16 @@ async function createUser(userInfo) {
 
 async function updateUser(userId, userInfo) {
   try {
+    if (userInfo.oldPassword) {
+      console.log('trying to update user password');
+      const hashedOldPassword = await bcrypt.hash(userInfo.oldPassword, SALT);
+      const passwordMatch = await bcrypt.compare(hashedOldPassword, userInfo.oldPassword);
+      console.log('password match result', passwordMatch);
+      if (!passwordMatch) throw Error('Your old password is incorrect! Please try again.');
+      // remove the old password after comparing to make sure updating is allowed
+    }
+    delete userInfo.oldPassword;
+    
     const valueString = Object.keys(userInfo).map(
       (key, index) => {
         // special case for the allow_email field - since it's boolean, we need to remove the quotes from the 2nd half of the entry

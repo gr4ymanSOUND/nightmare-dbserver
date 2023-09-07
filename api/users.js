@@ -56,9 +56,6 @@ userRouter.post('/create', async (req, res, next) => {
 // api/users/login sets `user` to the request body which getUser() destructures
 userRouter.post('/login', async (req, res, next) => {
   const { username, password } = req.body;
-
-  console.log('req body in login after register', req.body)
-
   try {
     const user = await getUser({username, password});
 
@@ -101,7 +98,7 @@ userRouter.patch('/:userId', requireUser, async (req, res, next) => {
     res.send(updatedUser);
   } catch (error) {
     console.error(error);
-    next(error);
+    res.status(400).send(`There was a problem updating your account. Please check all fields and try again \n (hint: your old password may not be correct)`);
   }
 
 });
