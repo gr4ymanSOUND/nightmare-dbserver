@@ -24,15 +24,13 @@ videoRouter.get('/', async (req, res, next) => {
 videoRouter.post('/create', async (req, res, next) => {  
   const prefix = 'Bearer ';
 
-  console.log('req body in video post api', req.body);
-
   try {
     const auth = req.headers.authorization;
     const token = auth.slice(prefix.length);
     let authorizedUser = jwt.verify(token, process.env.JWT_SECRET);
     if (authorizedUser.username) {
-      const newVideoData = req.body;
-      const newVideo = await addVideo(newVideoData);
+      const { newVideoInfo } = req.body;
+      const newVideo = await addVideo(newVideoInfo);
       res.send(newVideo);
     } else {
       throw new Error('The server ran into an issue creating the video due to missing authorization.');
@@ -51,7 +49,7 @@ videoRouter.patch('/:videoId', requireUser, async (req, res, next) => {
     const token = auth.slice(prefix.length);
     let authorizedUser = jwt.verify(token, process.env.JWT_SECRET);
     if (authorizedUser.username) {
-      const videoInfo = req.body;
+      const { videoInfo } = req.body;
       const updatedVideo = await updateVideo(videoId, videoInfo);
       res.send(updatedVideo);
     } else {
