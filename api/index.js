@@ -39,5 +39,8 @@ apiRouter.use(async (req, res, next) => {
 import { userRouter} from './users.js';
 apiRouter.use('/users', userRouter);
 
+import { videoRouter } from './videos.js';
+apiRouter.use('/videos', videoRouter);
+
 
 export { apiRouter };
