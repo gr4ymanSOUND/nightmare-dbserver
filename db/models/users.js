@@ -97,7 +97,7 @@ async function updateUser(userId, userInfo) {
     const valueString = Object.keys(userInfo).map(
       (key, index) => {
         // special case for the allow_email field - since it's boolean, we need to remove the quotes from the 2nd half of the entry
-        if (key == 'allow_email') {
+        if (key == 'allow_email' || key == 'is_admin') {
           return `${key} = ${userInfo[key]}`
         }
         return `${key} = '${userInfo[key]}'`
