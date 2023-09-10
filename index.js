@@ -30,9 +30,14 @@ server.use('/api', apiRouter);
 // connect to the server
 const PORT = process.env.PORT || 4000;
 
-// define a server handle to close open tcp connection after unit tests have run
-const handle = server.listen(PORT, async () => {
-  console.log(`Server is running on ${PORT}!`);
-});
+// open the server
+
+if (process.env.NODE_ENV == 'development') {
+  server.listen(PORT, async () => {
+    console.log(`Server is running on ${PORT}!`);
+  });
+} else {
+  server.listen();
+}
 
 
