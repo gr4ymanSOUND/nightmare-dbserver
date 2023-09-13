@@ -1,6 +1,8 @@
 import { pool } from '../connectionpool.js'
 
-import bcrypt from 'bcrypt';
+// import bcrypt from 'bcrypt';
+// reg bcrypt is causing issues on the shared hosting server, tyring 'bcryptjs' instead
+import bcrypt from 'bcryptjs';
 const SALT = 13;
 
 async function getAllUsers() {
