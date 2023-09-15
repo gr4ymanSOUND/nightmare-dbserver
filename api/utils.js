@@ -1,3 +1,4 @@
+// simple middleware utility that makes sure the user is logged in
 function requireUser(req, res, next) {
     if (!req.user) {
       next({

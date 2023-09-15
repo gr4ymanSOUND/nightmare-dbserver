@@ -27,8 +27,6 @@ async function getVideoById(videoId) {
 }
 
 async function addVideo(newVideoData) {
-
-  console.log('video data in db model for add', newVideoData)
   const {title, description, video_url} = newVideoData;
   
   try {

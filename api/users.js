@@ -14,6 +14,7 @@ import {
     createUser
 } from '../db/models/users.js';
 
+// get a list of all users -- used for the admins
 userRouter.get('/', requireUser, async (req, res, next) => {
   const prefix = 'Bearer ';
   try {
@@ -31,17 +32,6 @@ userRouter.get('/', requireUser, async (req, res, next) => {
   }
 });
 
-// NO AUTHENTICATION NEEDED IN THIS VERSION OF GET '/', GOOD FOR DOUBLE CHECKING API AND SERVER ARE CONNECTED
-// userRouter.get('/', async (req, res, next) => {
-//   try {
-//     const allUsers = await getAllUsers();
-//     res.send(allUsers)
-//   } catch (error) {
-//     next(error);
-//   }
-// });
-
-
 // create new users from the user form
 userRouter.post('/create', async (req, res, next) => {  
   try {
@@ -53,7 +43,7 @@ userRouter.post('/create', async (req, res, next) => {
   }
 });
 
-// api/users/login sets `user` to the request body which getUser() destructures
+// log in existing users
 userRouter.post('/login', async (req, res, next) => {
   const { username, password } = req.body;
   try {
@@ -72,6 +62,8 @@ userRouter.post('/login', async (req, res, next) => {
   }
 });
 
+// used to pull the user info for already logged in users
+// if they have a token in localstorage, this will get called every time the app loads
 userRouter.get('/me', requireUser, async (req, res, next) => {
     const prefix = 'Bearer ';
     try {
@@ -90,6 +82,7 @@ userRouter.get('/me', requireUser, async (req, res, next) => {
     }
 });
 
+// update user accounts
 userRouter.patch('/:userId', requireUser, async (req, res, next) => {
   try {
     const { userId } = req.params;
@@ -103,6 +96,7 @@ userRouter.patch('/:userId', requireUser, async (req, res, next) => {
 
 });
 
+// doesn't actually delete a user, but updates their status to be inactive instead
 userRouter.delete('/:userId', requireUser, async (req, res, next) => {
   try {
     const { userId } = req.params;

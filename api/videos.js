@@ -21,6 +21,7 @@ videoRouter.get('/', async (req, res, next) => {
   }
 });
 
+// add new videos
 videoRouter.post('/create', async (req, res, next) => {  
   const prefix = 'Bearer ';
 
@@ -40,6 +41,7 @@ videoRouter.post('/create', async (req, res, next) => {
   }
 });
 
+// update existing videos
 videoRouter.patch('/:videoId', requireUser, async (req, res, next) => {
   const prefix = 'Bearer ';
 
