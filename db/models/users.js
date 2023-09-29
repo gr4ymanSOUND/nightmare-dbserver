@@ -140,10 +140,30 @@ async function updateUser(userId, userInfo) {
   }
 }
 
+async function resetPassword(userId, basePassword) {
+  try {
+    
+    const hashedPassword = await bcrypt.hash(basePassword, SALT);
+
+    const [ results ] = await pool.query(`
+      UPDATE users
+      SET password = ?
+      WHERE id = ?;
+    `, [hashedPassword, userId]);
+
+    // MySQL doesn't return anything super useful right off the bat from an update, but I don't need it here
+    return 'success';
+    
+  } catch (error) {
+    throw error;
+  }
+}
+
 export {
   getAllUsers,
   getUser,
   getUserById,
   createUser,
-  updateUser
+  updateUser,
+  resetPassword
 };

@@ -48,8 +48,8 @@ async function buildTables() {
 async function addInitialData () {
 
     const usersToCreate = [
-      { email:'austin.lawrence.al@gmail.com', username:'coolhatguy', password:'ochocinco', allow_email: true, status: 'active', is_admin: true },
-      { email:'testing@test.test', username:'CultLeaderDerek', password:'l34dER', allow_email: false, status: 'active', is_admin: true}
+      { email:'austin.lawrence.al@gmail.com', username:'coolhatguy', password:'ochocinco', allow_email: true, is_admin: true, status: 'active'},
+      { email:'testing@test.test', username:'CultLeaderDerek', password:'l34dER', allow_email: false, is_admin: true, status: 'active'}
     ];
 
     console.log("creating users");

@@ -11,7 +11,8 @@ import {
     getUserById,
     getAllUsers,
     updateUser,
-    createUser
+    createUser,
+    resetPassword
 } from '../db/models/users.js';
 
 // get a list of all users -- used for the admins
@@ -94,6 +95,18 @@ userRouter.patch('/:userId', requireUser, async (req, res, next) => {
     res.status(400).send(`There was a problem updating your account. Please check all fields and try again \n (hint: your old password may not be correct)`);
   }
 
+});
+
+// reset user passwords
+userRouter.patch('/reset/:userId', requireUser, async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const { basePassword } = req.body;
+    const resettingPassword = await resetPassword(userId, basePassword);
+    res.send(resettingPassword);
+  } catch (error) {
+    console.error(error);
+  }
 });
 
 // doesn't actually delete a user, but updates their status to be inactive instead
