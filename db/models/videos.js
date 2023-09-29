@@ -27,13 +27,13 @@ async function getVideoById(videoId) {
 }
 
 async function addVideo(newVideoData) {
-  const {title, description, video_url} = newVideoData;
+  const {title, description, video_url, status} = newVideoData;
   
   try {
     const [ result ] = await pool.query(`
-      INSERT INTO videos (title, description, video_url)
-      VALUES (?, ?, ?);
-    `, [title, description, video_url]);
+      INSERT INTO videos (title, description, video_url, status)
+      VALUES (?, ?, ?, ?);
+    `, [title, description, video_url, status]);
 
     const newVideoId = result.insertId;
     const newVideo = await getVideoById(newVideoId);
@@ -46,13 +46,13 @@ async function addVideo(newVideoData) {
 
 async function updateVideo(videoId, videoInfo) {
   try {
-    const {title, description, video_url} = videoInfo;
+    const {title, description, video_url, status} = videoInfo;
 
     const [ results ] = await pool.query(`
       UPDATE videos
-      SET title = ?, description = ?, video_url = ?
+      SET title = ?, description = ?, video_url = ?, status = ?
       WHERE id = ?;
-    `, [title, description, video_url, videoId]);
+    `, [title, description, video_url, status, videoId]);
 
     const updatedVideo = await getVideoById(videoId);
     return updatedVideo;
