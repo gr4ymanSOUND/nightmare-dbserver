@@ -25,7 +25,7 @@ server.use(express.static(path.join(__dirname, 'build')));
 
 // here's our API
 import { apiRouter } from './api/index.js';
-server.use('/api', apiRouter);
+server.use('/nightmareApi', apiRouter);
 
 // connect to the server
 const PORT = process.env.PORT || 4000;
